@@ -1,7 +1,8 @@
 requriments:
+   run in the Terminal
+	     npm install mongodb express mongoose cors
 
-	nodejs  
-	mongodb ::|| innistate the sever address in script.js file line no.1
+	mongodb atlas(globle host) or compass(local host) is require with connection url 
 
 
 
