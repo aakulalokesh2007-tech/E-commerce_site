@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Customers</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* ⬅️ Back Button Styling */
+        .back-btn {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin-bottom: 30px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateX(-5px);
+        }
+
+        /* Table Container Styling */
+        .table-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .table-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Sleek Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #555;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background-color: #f1f9ff;
+        }
+
+        td {
+            color: #444;
+            font-size: 0.95rem;
+        }
+
+        /* Role Badge Styling */
+        .badge {
+            background: #4facfe;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .loading-text {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="admin_dashboard.html" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <div class="table-container">
+        <h2><i class="fa-solid fa-users" style="color: #4facfe;"></i> Customer & Admin Directory</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody id="customerTableBody">
+                <tr>
+                    <td colspan="3" class="loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Loading data from database...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // This function runs automatically as soon as the HTML finishes loading
+        document.addEventListener('DOMContentLoaded', async () => {
+            const tableBody = document.getElementById('customerTableBody');
+
+            try {
+                // Fetch the data from our new backend route
+                const response = await fetch('/api/customers');
+                const customers = await response.json();
+
+                // Clear the "Loading..." text
+                tableBody.innerHTML = '';
+
+                // If the database is empty
+                if (customers.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">No customers found in the database.</td></tr>`;
+                    return;
+                }
+
+                // Loop through every customer in the database and create a table row for them
+                customers.forEach(customer => {
+                    // Create a new <tr> element
+                    const row = document.createElement('tr');
+                    
+                    // Fill it with HTML, injecting the database variables
+                    row.innerHTML = `
+                        <td><strong>${customer.fullName}</strong></td>
+                        <td>${customer.email}</td>
+                        <td><span class="badge">${customer.role}</span></td>
+                    `;
+                    
+                    // Add the row to the table
+                    tableBody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Failed to load data from the server.</td></tr>`;
+            }
+        });
+    </script>
+
+</body>
+</html>

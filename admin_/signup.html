@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* Universal reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #ff7e5f, #feb47b);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; 
+}
+
+/* ⬅️ Back Button Styling */
+.back-btn {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    background: rgba(255, 255, 255, 0.2); 
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateX(-5px); 
+}
+
+/* Signup Box Styling (Made slightly wider to accommodate more fields) */
+.signup-box {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); 
+    text-align: center;
+    width: 320px; 
+}
+
+h2 {
+    color: #ff7e5f;
+    margin-bottom: 20px; 
+}
+
+input {
+    width: 100%; 
+    padding: 10px;
+    margin-bottom: 15px; 
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #ff7e5f;
+}
+
+/* Signup Button Styling */
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background: #ff7e5f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease; 
+    margin-top: 5px;
+}
+
+button[type="submit"]:hover {
+    background: #ff4b2b;
+}
+
+/* 🔗 Login Link Styling */
+.login-link {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
+.login-link a {
+    color: #ff7e5f;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.login-link a:hover {
+    color: #ff4b2b;
+    text-decoration: underline;
+}
+
+/* Responsive adjustment */
+@media (max-width: 600px) {
+    .back-btn {
+        top: 20px;
+        left: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<a href="/"><button class="back-btn">
+    <i class="fa-solid fa-arrow-left"></i> Back
+</button></a>
+   
+<div class="signup-box">
+    <h2>Create Account</h2>
+    
+    <form id="signupForm">
+        <input type="text" placeholder="Full Name" required id="fullName">
+        <input type="email" placeholder="Email Address" required id="email">
+        <input type="password" placeholder="Password" required id="password">
+        <input type="password" placeholder="Confirm Password" required id="confirmPassword">
+        
+        <button type="submit">Sign Up</button>
+    </form>
+
+    <p class="login-link">
+        Already have an account? <a href="adminlogin.html">Login here</a>
+    </p>
+
+</div>
+
+<script>
+    document.getElementById('signupForm').addEventListener('submit', async function(event) {
+        // 1. Stop the page from reloading or redirecting automatically
+        event.preventDefault();
+
+        // 2. Grab the exact text from the inputs, and remove any accidental spaces (.trim())
+        const fullName = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+        // 3. STRICT CHECK: Are any fields totally blank?
+        if (!fullName || !email || !password || !confirmPassword) {
+            alert("Please fill out all fields completely.");
+            return; // Stop the code right here
+        }
+
+        // 4. STRICT CHECK: Do the passwords actually match?
+        if (password !== confirmPassword) {
+            alert("Passwords do not match! Please try again.");
+            return; // Stop the code right here
+        }
+
+        // 5. If it passes the checks, send it to the backend
+        try {
+            const response = await fetch('/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    fullName: fullName,
+                    email: email,
+                    password: password
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(data.message); // Success!
+                window.location.href = 'adminlogin.html'; // Now redirect them
+            } else {
+                alert(data.message); // Show error from server (like "Email already exists")
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Failed to connect to the server.");
+        }
+    });
+</script>
+
+</body>
+</html>

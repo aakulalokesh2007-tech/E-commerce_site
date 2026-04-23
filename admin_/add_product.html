@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Product</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* ⬅️ Back Button Styling */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateX(-5px);
+        }
+
+        /* Form Container Styling */
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            text-align: center;
+        }
+
+        .form-container h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .input-group input, 
+        .input-group select, 
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, 
+        .input-group select:focus, 
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="admin_dashboard.html" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+
+    <div class="form-container">
+        <h2><i class="fa-solid fa-box-open" style="color: #4facfe;"></i> Add Product</h2>
+        
+        <form id="addProductForm">
+            <div class="input-group">
+                <label for="productName">Product Name *</label>
+                <input type="text" id="productName" placeholder="e.g., Wireless Mouse" required>
+            </div>
+
+            <div class="input-group">
+                <label for="productPrice">Price ($) *</label>
+                <input type="number" id="productPrice" placeholder="0.00" step="0.01" required>
+            </div>
+
+            <div class="input-group">
+                <label for="productCategory">Category *</label>
+                <select id="productCategory" required>
+                    <option value="" disabled selected>Select a category...</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Home">Home & Garden</option>
+                    <option value="Toys">Toys</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="productStock">Stock Quantity *</label>
+                <input type="number" id="productStock" placeholder="e.g., 50" required>
+            </div>
+
+            <div class="input-group">
+                <label for="productDesc">Description (Optional)</label>
+                <textarea id="productDesc" placeholder="Brief details about the product..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Save Product</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('addProductForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            // Grab the values
+            const name = document.getElementById('productName').value.trim();
+            const price = document.getElementById('productPrice').value;
+            const category = document.getElementById('productCategory').value;
+            const stock = document.getElementById('productStock').value;
+            const description = document.getElementById('productDesc').value.trim();
+
+            try {
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        price: parseFloat(price), // Ensure price is a number
+                        category: category,
+                        stock: parseInt(stock, 10), // Ensure stock is an integer
+                        description: description
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message); // Success!
+                    document.getElementById('addProductForm').reset(); // Clear the form
+                } else {
+                    alert(data.message); // Server error (e.g., missing fields)
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Failed to connect to the server.");
+            }
+        });
+    </script>
+
+</body>
+</html>
