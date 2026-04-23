@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 🔵 Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, #00B4DB, #0083B0);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover { background: rgba(255, 255, 255, 0.4); }
+
+        /* Checkout Layout */
+        .checkout-container {
+            padding: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .section-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .section-box h2 {
+            color: #0083B0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* Form Inputs */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea { resize: vertical; min-height: 100px; }
+        textarea:focus, input:focus { outline: none; border-color: #00B4DB; }
+
+        /* Payment Option Styling */
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #00B4DB;
+            border-radius: 8px;
+            background: #e0f7fa;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .payment-option input { margin-right: 15px; transform: scale(1.2); }
+        .payment-option i { font-size: 1.5rem; color: #0083B0; margin-right: 15px; }
+        .payment-option span { font-size: 1.1rem; font-weight: bold; color: #333; }
+
+        /* Order Summary Side */
+        .summary-total {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            background: #1cc88a;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .place-order-btn:hover { background: #17a673; }
+
+        @media (max-width: 768px) {
+            .checkout-container { grid-template-columns: 1fr; }
+        }
+
+
+
+        /* --- Success Modal Styling --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 90%;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: #1cc88a;
+            margin-bottom: 20px;
+        }
+
+        /* Fun pop-in animation */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="cart.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Cart</a>
+        <h2><i class="fa-solid fa-lock"></i> Secure Checkout</h2>
+    </nav>
+
+    <div class="checkout-container">
+        
+        <div>
+            <div class="section-box">
+                <h2><i class="fa-solid fa-truck"></i> Delivery Details</h2>
+                <label for="deliveryAddress">Shipping Address</label>
+                <textarea id="deliveryAddress" placeholder="Enter your full street address, city, and zip code..." required></textarea>
+            </div>
+
+            <div class="section-box">
+                <h2><i class="fa-solid fa-wallet"></i> Payment Method</h2>
+                
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="COD" checked>
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    <span>Cash on Delivery (COD)</span>
+                </label>
+                <p style="color: #666; font-size: 0.9rem;">* You will pay the delivery agent in cash when your items arrive.</p>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-box">
+                <h2>Order Summary</h2>
+                <div class="summary-total">Total: $<span id="checkoutTotal">0.00</span></div>
+                <button class="place-order-btn" onclick="submitFinalOrder()">Place Order</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content">
+            <i class="fa-solid fa-circle-check success-icon"></i>
+            <h2>Order Placed Successfully!</h2>
+            <p>Your items are on the way. You will pay via Cash on Delivery.</p>
+            <p style="color: #888; font-size: 0.9rem; margin-top: 15px;">
+                <i class="fa-solid fa-spinner fa-spin"></i> Redirecting to your orders...
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 1. Calculate the total when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+            let total = 0;
+            
+            if (cart.length === 0) {
+                alert("Your cart is empty! Redirecting to store.");
+                window.location.href = 'user_home.html';
+            }
+
+            cart.forEach(item => {
+                let safePrice = parseFloat(item.price) || 0;
+                let safeQty = parseInt(item.quantity) || 1;
+                total += (safePrice * safeQty);
+            });
+
+            document.getElementById('checkoutTotal').innerText = total.toFixed(2);
+        });
+
+        // 2. The function that actually sends the data to the database
+        async function submitFinalOrder() {
+            const userName = localStorage.getItem('loggedInUser');
+            const address = document.getElementById('deliveryAddress').value.trim();
+            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+
+            // Strict Validation
+            if (!userName) {
+                alert("Please log in to place an order.");
+                window.location.href = 'userlogin.html';
+                return;
+            }
+            if (address === "") {
+                alert("Please enter a valid delivery address.");
+                return;
+            }
+
+            // Map the cart to match your new MongoDB Schema
+            const orderPayload = cart.map(item => ({
+                customerName: userName,
+                productName: item.name,
+                quantity: item.quantity,
+                totalPrice: item.price * item.quantity,
+                status: 'Pending',
+                address: address, // NEW
+                paymentMethod: 'Cash on Delivery' // NEW
+            }));
+
+            try {
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderPayload)
+                });
+
+                if (response.ok) {
+                    // 1. Empty the cart immediately
+                    localStorage.removeItem('myCart'); 
+                    
+                    // 2. Show the beautiful success modal
+                    document.getElementById('successModal').style.display = 'flex';
+                    
+                    // 3. Wait 3 seconds, then automatically redirect to their orders
+                    setTimeout(() => {
+                        window.location.href = 'user_orders.html';
+                    }, 3000);
+
+                } else {
+                    const data = await response.json();
+                    alert(data.message); 
+                }
+            } catch (error) {
+                console.error('Checkout Error:', error);
+                alert("Failed to connect to the server.");
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 🔵 Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, #00B4DB, #0083B0);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover { background: rgba(255, 255, 255, 0.4); }
+
+        /* Cart Container */
+        .cart-container {
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .cart-header {
+            margin-bottom: 30px;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Cart Items */
+        .cart-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-info h3 {
+            color: #0083B0;
+            margin-bottom: 5px;
+        }
+
+        .item-price {
+            color: #666;
+            font-weight: bold;
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .quantity-badge {
+            background: #e0f7fa;
+            color: #0083B0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .remove-btn {
+            background: #ff416c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .remove-btn:hover { background: #ff4b2b; }
+
+        /* Checkout Section */
+        .checkout-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        .total-price {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .checkout-btn {
+            background: #1cc88a;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .checkout-btn:hover { background: #17a673; }
+        
+        .empty-cart-msg {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #888;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="user_home.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Keep Shopping</a>
+        <h2><i class="fa-solid fa-cart-shopping"></i> My Cart</h2>
+    </nav>
+
+    <div class="cart-container">
+        <div class="cart-header">
+            <h1>Review Your Items</h1>
+            <button class="remove-btn" onclick="clearCart()" style="background: #888;">Empty Cart</button>
+        </div>
+
+        <div id="cartList"></div>
+
+        <div class="checkout-box" id="checkoutBox" style="display: none;">
+            <div class="total-price">Total: $<span id="cartTotal">0.00</span></div>
+            <button class="checkout-btn" onclick="proceedToCheckout()"><i class="fa-solid fa-credit-card"></i> Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadCart);
+
+        function loadCart() {
+            const cartList = document.getElementById('cartList');
+            const checkoutBox = document.getElementById('checkoutBox');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            // Grab the cart from memory
+            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+            
+            cartList.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                cartList.innerHTML = `<div class="empty-cart-msg">Your cart is completely empty.</div>`;
+                checkoutBox.style.display = 'none';
+                return;
+            }
+
+            // Display the items and calculate the total
+            // Display the items and calculate the total safely
+            cart.forEach((item, index) => {
+                // Safety check: Ensure price and quantity are actual numbers
+                let safePrice = parseFloat(item.price) || 0;
+                let safeQuantity = parseInt(item.quantity) || 1;
+
+                total += (safePrice * safeQuantity);
+
+                const itemRow = document.createElement('div');
+                itemRow.className = 'cart-item';
+                itemRow.innerHTML = `
+                    <div class="item-info">
+                        <h3>${item.name}</h3>
+                        <div class="item-price">$${safePrice.toFixed(2)} each</div>
+                    </div>
+                    <div class="item-actions">
+                        <span class="quantity-badge">Qty: ${safeQuantity}</span>
+                        <button class="remove-btn" onclick="removeItem(${index})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                cartList.appendChild(itemRow);
+            });
+
+            cartTotal.innerText = total.toFixed(2);
+            checkoutBox.style.display = 'block';
+        }
+
+        function removeItem(index) {
+            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+            cart.splice(index, 1); // Remove that specific item
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            loadCart(); // Reload the screen
+        }
+
+        function clearCart() {
+            if(confirm("Are you sure you want to empty your cart?")) {
+                localStorage.removeItem('myCart');
+                loadCart();
+            }
+        }
+
+        function proceedToCheckout() {
+            // Just redirect them to the new payment page!
+            window.location.href = 'checkout.html';
+        }
+    </script>
+
+</body>
+</html>

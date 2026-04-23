@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Registration</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #00B4DB, #0083B0);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 40px 20px;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateX(-5px);
+        }
+
+        /* Slightly wider box to accommodate more fields beautifully */
+        .registration-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 500px; 
+        }
+
+        .registration-box h2 {
+            color: #0083B0;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        /* Grid layout for fields */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* Make address and passwords take up full width */
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .input-group {
+            position: relative;
+            text-align: left;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        /* Special padding for textarea since it doesn't need a center icon */
+        .input-group textarea {
+            padding: 12px; 
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #00B4DB;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background: #00B4DB;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button[type="submit"]:hover {
+            background: #0083B0;
+        }
+
+        .login-link {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #00B4DB;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 500px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="/" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Main Menu
+    </a>
+
+    <div class="registration-box">
+        <h2><i class="fa-solid fa-address-card"></i> Customer Registration</h2>
+        
+        <form id="registrationForm">
+            <div class="form-grid">
+                <div class="input-group">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="regName" placeholder="Full Name" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="regPhone" placeholder="Phone Number" required>
+                </div>
+
+                <div class="input-group full-width">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="regEmail" placeholder="Email Address" required>
+                </div>
+                
+                <div class="input-group full-width">
+                    <textarea id="regAddress" placeholder="Full Shipping Address" required></textarea>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="regPassword" placeholder="Password" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <input type="password" id="regConfirm" placeholder="Confirm Password" required>
+                </div>
+            </div>
+            
+            <button type="submit">Complete Registration</button>
+        </form>
+
+        <p class="login-link">
+            Already have an account? <a href="userlogin.html">Login here</a>
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const fullName = document.getElementById('regName').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const address = document.getElementById('regAddress').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const confirmPassword = document.getElementById('regConfirm').value.trim();
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return; 
+            }
+
+            try {
+                const response = await fetch('/api/user/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullName: fullName,
+                        email: email,
+                        phone: phone,
+                        address: address,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message); 
+                    window.location.href = 'userlogin.html'; 
+                } else {
+                    alert(data.message); 
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Failed to connect to the server.");
+            }
+        });
+    </script>
+
+</body>
+</html>

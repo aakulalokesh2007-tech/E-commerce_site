@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, #00B4DB, #0083B0);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Product Container */
+        .product-container {
+            max-width: 900px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            overflow: hidden;
+            min-height: 400px;
+        }
+
+        /* Left Side: Icon/Image Area */
+        .product-image-area {
+            background: #e0f7fa;
+            width: 40%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 8rem;
+            color: #00B4DB;
+        }
+
+        /* Right Side: Details */
+        .product-details {
+            padding: 40px;
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .category {
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 2.2rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 2rem;
+            color: #0083B0;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+
+        .stock-status {
+            font-weight: bold;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+        
+        .in-stock { color: #1cc88a; }
+        .out-of-stock { color: #e74a3b; }
+
+        .add-to-cart-btn {
+            padding: 15px;
+            background: #00B4DB;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-align: center;
+        }
+
+        .add-to-cart-btn:hover { background: #0083B0; }
+        .add-to-cart-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        .loading, .error {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5rem;
+            color: #666;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="user_home.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Store</a>
+        <h2><i class="fa-solid fa-store"></i> MyStore</h2>
+    </nav>
+
+    <div id="mainContent">
+        <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Loading product details...</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Get the product ID from the URL (e.g., ?id=12345)
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            const mainContent = document.getElementById('mainContent');
+
+            if (!productId) {
+                mainContent.innerHTML = `<div class="error">Product not found.</div>`;
+                return;
+            }
+
+            try {
+                // 2. Fetch the specific product from the server
+                const response = await fetch(`/api/products/${productId}`);
+                const product = await response.json();
+
+                if (!response.ok) throw new Error(product.message);
+
+                // 3. Check stock levels
+                const isOutOfStock = product.stock === 0;
+                const stockText = isOutOfStock ? 'Out of Stock' : `${product.stock} Units Available`;
+                const stockClass = isOutOfStock ? 'out-of-stock' : 'in-stock';
+                const buttonState = isOutOfStock ? 'disabled' : '';
+                const buttonText = isOutOfStock ? 'Currently Unavailable' : 'Add to Cart';
+
+                // Assign a fun icon based on category
+                let icon = 'fa-box';
+                if(product.category.toLowerCase() === 'electronics') icon = 'fa-laptop';
+                if(product.category.toLowerCase() === 'clothing') icon = 'fa-shirt';
+
+                // 4. Inject the HTML
+                mainContent.innerHTML = `
+                    <div class="product-container">
+                        <div class="product-image-area">
+                            <i class="fa-solid ${icon}"></i>
+                        </div>
+                        <div class="product-details">
+                            <div class="category">${product.category}</div>
+                            <h1 class="title">${product.name}</h1>
+                            <div class="price">$${product.price.toFixed(2)}</div>
+                            <p class="description">${product.description || "No description provided."}</p>
+                            <div class="stock-status ${stockClass}"><i class="fa-solid fa-boxes-stacked"></i> ${stockText}</div>
+                            
+                            <button class="add-to-cart-btn" ${buttonState} onclick="addToCart('${product._id}', '${product.name}', ${product.price})">
+                                <i class="fa-solid fa-cart-plus"></i> ${buttonText}
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error:', error);
+                mainContent.innerHTML = `<div class="error" style="color: red;">Failed to load product.</div>`;
+            }
+        });
+
+        // The real Add to Cart logic
+        function addToCart(id, name, price) {
+            // 1. Get the current cart from memory, or start an empty one if it doesn't exist
+            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+            
+            // 2. Check if this exact item is already in the cart
+            let existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                // If it's already there, just increase the quantity
+                existingItem.quantity += 1;
+            } else {
+                // If it's new, add it to the cart list
+                cart.push({ id: id, name: name, price: price, quantity: 1 });
+            }
+            
+            // 3. Save the updated cart back into the browser's memory
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            
+            alert(`Success! Added ${name} to your cart.`);
+        }
+        
+    </script>
+</body>
+</html>

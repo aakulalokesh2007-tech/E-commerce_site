@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 🔵 Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, #00B4DB, #0083B0);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h2 { font-size: 1.5rem; }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover { background: rgba(255, 255, 255, 0.4); }
+
+        /* Order History Container */
+        .orders-container {
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .orders-header {
+            margin-bottom: 30px;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        /* Individual Order Cards */
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .order-info h3 {
+            color: #0083B0;
+            margin-bottom: 5px;
+            font-size: 1.3rem;
+        }
+
+        .order-details {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .order-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            min-width: 110px;
+        }
+
+        .status-pending { background-color: #f6c23e; } /* Yellow */
+        .status-shipped { background-color: #36b9cc; } /* Blue */
+        .status-delivered { background-color: #1cc88a; } /* Green */
+
+        .message-text {
+            text-align: center;
+            color: #888;
+            font-size: 1.2rem;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="user_home.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Store</a>
+        <h2><i class="fa-solid fa-box-open"></i> Order History</h2>
+    </nav>
+
+    <div class="orders-container">
+        <div class="orders-header">
+            <h1>My Orders</h1>
+            <p>Track your recent purchases</p>
+        </div>
+
+        <div id="ordersList">
+            <div class="message-text"><i class="fa-solid fa-spinner fa-spin"></i> Fetching your orders...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const ordersList = document.getElementById('ordersList');
+            
+            // 1. Get the user's name from localStorage
+            const userName = localStorage.getItem('loggedInUser');
+
+            // 2. Security Check: If they bypass the login page, kick them back
+            if (!userName) {
+                alert("Please log in to view your orders.");
+                window.location.href = 'userlogin.html';
+                return;
+            }
+
+            try {
+                // 3. Fetch ONLY the orders for this specific user
+                const response = await fetch(`/api/user/orders/${encodeURIComponent(userName)}`);
+                const orders = await response.json();
+
+                ordersList.innerHTML = ''; // Clear loading text
+
+                if (orders.length === 0) {
+                    ordersList.innerHTML = `<div class="message-text">You haven't placed any orders yet. Time to start shopping!</div>`;
+                    return;
+                }
+
+                // 4. Loop through the orders and build the cards
+                orders.forEach(order => {
+                    const dateObj = new Date(order.orderDate);
+                    const formattedDate = dateObj.toLocaleDateString();
+
+                    // Determine the badge color
+                    let statusClass = 'status-pending';
+                    if (order.status.toLowerCase() === 'shipped') statusClass = 'status-shipped';
+                    if (order.status.toLowerCase() === 'delivered') statusClass = 'status-delivered';
+
+                    const card = document.createElement('div');
+                    card.className = 'order-card';
+                    card.innerHTML = `
+                        <div class="order-info">
+                            <h3>${order.productName}</h3>
+                            <div class="order-details">
+                                <strong>Order Date:</strong> ${formattedDate} <br>
+                                <strong>Quantity:</strong> ${order.quantity}
+                            </div>
+                            <div class="order-price">Total: $${order.totalPrice.toFixed(2)}</div>
+                        </div>
+                        <div class="status-badge ${statusClass}">
+                            ${order.status}
+                        </div>
+                    `;
+                    
+                    ordersList.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                ordersList.innerHTML = `<div class="message-text" style="color: red;">Failed to load order history.</div>`;
+            }
+        });
+    </script>
+
+</body>
+</html>
