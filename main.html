@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selection Portal</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Reset basic styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        
+       
+
+        
+        /* Container to hold the main buttons side-by-side */
+        .button-container {
+            display: flex;
+            gap: 40px; 
+            padding: 20px;
+        }
+
+        /* Dark, sleek background */
+        body {
+            background-color: #12141d;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative; /* Added so the back button can position itself relative to the body */
+        }
+
+
+        /* Base Main Button Styling */
+        .role-btn {
+            width: 250px;
+            height: 250px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            color: white;
+            transition: all 0.3s ease; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Button Logos */
+        .role-btn i {
+            font-size: 5rem;
+        }
+
+        /* Main Button Text */
+        .role-btn span {
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* 🔴 Admin Button Gradient */
+        .admin {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        }
+
+        /* 🔵 User Button Gradient */
+        .user {
+            background: linear-gradient(135deg, #00B4DB, #0083B0);
+        }
+
+        /* ✨ Main Button Hover Effects */
+        .role-btn:hover {
+            transform: translateY(-10px); 
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5); 
+            filter: brightness(1.1); 
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .button-container {
+                flex-direction: column;
+            }
+            
+        }
+    </style>
+</head>
+<body>
+
+    
+
+    <div class="button-container">
+        
+        <button id="adminBtn" class="role-btn admin">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Admin</span>
+        </button>
+
+        <button id="userBtn" class="role-btn user">
+            <i class="fa-solid fa-user-astronaut"></i>
+            <span>User</span>
+        </button>
+
+    </div>
+
+    <script>
+
+        document.getElementById('adminBtn').addEventListener('click', function() {
+            window.location.href = 'admin_/adminlogin.html'; 
+        });
+
+        document.getElementById('userBtn').addEventListener('click', function() {
+            //window.location.href = 'user_home.html'; 
+        });
+
+
+
+        
+        document.getElementById('adminBtn').addEventListener('click', function() {
+            window.location.href = 'admin_/adminlogin.html'; 
+        });
+
+        document.getElementById('userBtn').addEventListener('click', function() {
+            // Remove the '//' and point it to the new user folder
+            window.location.href = 'user_/userlogin.html'; 
+        });
+
+    </script>
+
+</body>
+</html>

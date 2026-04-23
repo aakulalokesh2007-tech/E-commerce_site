@@ -1,0 +1,10 @@
+requriments:
+
+	nodejs  
+	mongodb ::|| innistate the sever address in script.js file line no.1
+
+
+
+
+script to run:
+	node <'relative path of script.js     ||file'>::run only script.js all the program will works
